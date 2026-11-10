@@ -1,0 +1,32 @@
+name: Enviar mensagem diária no WhatsApp (Green API)
+
+on:
+  schedule:
+    # Roda todo dia às 11:00 UTC = 08:00 no horário de Brasília (UTC-3)
+    # Ajuste o horário conforme necessário: https://crontab.guru
+    - cron: "0 11 * * *"
+  workflow_dispatch: {}   # permite rodar manualmente pelo botão "Run workflow"
+
+jobs:
+  enviar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        run: pip install requests
+
+      - name: Enviar mensagem
+        env:
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          SHEET_NAME: ${{ secrets.SHEET_NAME }}
+          GREEN_API_ID_INSTANCE: ${{ secrets.GREEN_API_ID_INSTANCE }}
+          GREEN_API_TOKEN_INSTANCE: ${{ secrets.GREEN_API_TOKEN_INSTANCE }}
+          GRUPO_CHAT_ID: ${{ secrets.GRUPO_CHAT_ID }}
+        run: python enviar_mensagem_diaria_green_v2.py
